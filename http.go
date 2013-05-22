@@ -25,20 +25,23 @@ import (
 
 
 type Response struct {
-	W http.ResponseWriter
+	RawHttpResponseWriter http.ResponseWriter
 }
 
 type Request struct {
-	R *http.Request
+	RawHttpRequest *http.Request
 }
 
 type URLArgs map[string] string
 
 type Handler func(Request, Response, URLArgs)
 
-func processRequest (request *http.Request, response http.ResponseWriter, args URLArgs, handler func(Response, Request)) {
+// processRequest provides the core of the framework's functionality.  Here, we will
+// apply middleware, append context arguments to the Request object, and possibly accomplish 
+// some other necessary functions of response processing.
+func processRequest (request *http.Request, response http.ResponseWriter, args URLArgs, handler Handler) {
 	fmt.Println("Processing Request:\t" + request.URL.Path)
 	fmt.Println(args)
-	handler(Response{W:response}, Request{R:request})
+	handler(Request{RawHttpRequest:request}, Response{RawHttpResponseWriter:response}, args)
 }
 

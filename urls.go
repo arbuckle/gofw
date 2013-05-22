@@ -28,7 +28,7 @@ import (
 // Basic struct for defining a URL Route
 type url struct {
 	Pattern *regexp.Regexp
-	Handler func(Response, Request)
+	Handler Handler
 	Name string
 }
 func (u *url) String() string {
@@ -42,7 +42,7 @@ type Routes struct {
 }
 
 // Register method on Routes provides means of adding URLs to a route.
-func (routes *Routes) Register(pattern string, handler func(Response, Request), name string) {
+func (routes *Routes) Register(pattern string, handler Handler, name string) {
 	routes.routes = append(routes.routes, &url{regexp.MustCompile(pattern), handler, name})
 }
 
