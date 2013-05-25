@@ -36,12 +36,35 @@ type URLArgs map[string] string
 
 type Handler func(Request, Response, URLArgs)
 
+
+// This won't compile.  Fix it.
+type Middleware struct {
+    ProcessRequest MiddlewarePreprocessing
+    ProcessResponse MiddlewarePostprocessing  
+}
+
+type MiddlewarePreprocessing func(Request, Response) (Request, Response, URLArgs)
+type MiddlewarePostprocessing func(Request, Response, URLArgs) (Request, Response, URLArgs)
+
+
 // processRequest provides the core of the framework's functionality.  Here, we will
 // apply middleware, append context arguments to the Request object, and possibly accomplish 
 // some other necessary functions of response processing.
 func processRequest (request *http.Request, response http.ResponseWriter, args URLArgs, handler Handler) {
-	fmt.Println("Processing Request:\t" + request.URL.Path)
-	fmt.Println(args)
+    fmt.Println("Processing Request:\t" + request.URL.Path)
+    fmt.Println(args)
+	
+    // get installed middleware
+    // walk through list of installed middleware
+    // apply middleware at each turn
+
 	handler(Request{RawHttpRequest:request}, Response{RawHttpResponseWriter:response}, args)
 }
+
+
+
+
+
+
+
 
