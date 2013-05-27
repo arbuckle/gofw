@@ -28,6 +28,12 @@ type Response struct {
 	RawHttpResponseWriter http.ResponseWriter
 }
 
+func (response *Response) SetHeader(key, value string) {
+    fmt.Println("Setting Header", key, value)
+    response.RawHttpResponseWriter.Header().Set(key, value)
+}
+
+
 type Request struct {
 	RawHttpRequest *http.Request
 }
@@ -36,15 +42,14 @@ type URLArgs map[string] string
 
 type Handler func(Request, Response, URLArgs)
 
+type PackageMiddleware []Middleware
 
-// This won't compile.  Fix it.
 type Middleware struct {
-    ProcessRequest MiddlewarePreprocessing
-    ProcessResponse MiddlewarePostprocessing  
+    ProcessRequest MiddlewareProcessor
+    ProcessResponse MiddlewareProcessor
 }
 
-type MiddlewarePreprocessing func(Request, Response) (Request, Response, URLArgs)
-type MiddlewarePostprocessing func(Request, Response, URLArgs) (Request, Response, URLArgs)
+type MiddlewareProcessor func(Request, Response, URLArgs) (Request, Response, URLArgs)
 
 
 // processRequest provides the core of the framework's functionality.  Here, we will
@@ -58,7 +63,22 @@ func processRequest (request *http.Request, response http.ResponseWriter, args U
     // walk through list of installed middleware
     // apply middleware at each turn
 
-	handler(Request{RawHttpRequest:request}, Response{RawHttpResponseWriter:response}, args)
+    gofwRequest := Request{RawHttpRequest:request}
+    gofwResponse := Response{RawHttpResponseWriter:response}
+
+    // Applying Request Middleware
+    for i := 0; i < len(middleware); i += 1 {
+        gofwRequest, gofwResponse, args = middleware[i].ProcessRequest(gofwRequest, gofwResponse, args)
+    }
+
+    // Executing target handler
+	handler(gofwRequest, gofwResponse, args)
+
+    // Applying Response Middleware
+    for i := len(middleware) - 1; i >= 0; i -= 1 {
+        gofwRequest, gofwResponse, args = middleware[i].ProcessResponse(gofwRequest, gofwResponse, args)
+        
+    }
 }
 
 

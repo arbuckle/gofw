@@ -8,7 +8,7 @@ import (
 
 
 var routes = Routes{}
-//var middleware = PackageMiddleware{}
+var middleware = []*Middleware{}
 
 
 type Template string //TEMP
@@ -64,7 +64,13 @@ func NewSettings() *Settings {
 
 func registerRoutes(r Routes) {
 	for _, url := range(r.routes) {
-		routes.routes = append(routes.routes, url)
+		routes.routes = append(routes.routes, url) //TODO:  consider removing dependency on this project-level global
+	}
+}
+
+func registerMiddleware(m []Middleware) {
+	for _, mWare := range(m) {
+		middleware = append(middleware, &mWare) //TODO:  consider removing dependency on this project-level global
 	}
 }
 
@@ -78,6 +84,7 @@ func Run(settings *Settings) {
 
     // Registering URLs declared in project base handler.
     registerRoutes(settings.URLHandler())
+    registerMiddleware(settings.MiddlewareHandlers)
 
     
 
