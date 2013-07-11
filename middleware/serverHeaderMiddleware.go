@@ -3,7 +3,7 @@
 // 2. writes a line to the end of the outgoing response.
 
 
-package gofw
+package middleware
 
 
 import (

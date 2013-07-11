@@ -12,6 +12,30 @@ var middleware = []*Middleware{}
 
 
 type Template string //TEMP
+
+// Template work:  Using pongo as the default template writer, since conceptually it's very similar 
+// to django/handlebars templates.  An important challenge will be to loosely couple templating engines with
+// the rest of the framework.  Alternative template engines should be able to expose an interface that the 
+// framework will connect with in order to manage template rendering.  
+
+
+// TemplateDirs []string > represents a list of directories to search for templates, in order
+// TemplateMiddleware > Templating will be handled entirely by a middleware plugin.  The last middleware
+//  in the list will be a template middleware, which will extract the rawHttpResponseWriter from the 
+//  gofw.Response object and write a template to it.
+
+// TemplateDirs []string > list of templates
+// TemplateLoader > func that turns templates into cached template objects.
+// TemplateMiddleware > func that reads template 
+
+// gofw will handle template loading using the directories enumerated in TemplateDirs []string
+// gofw will load and cache all templates when the application is bootstrapped.
+// gofw.Response will accept a template_name string which will determine the template to be written.
+// Templates will be handled by middleware, so anyone can improve or swap out the template engine easily.
+
+
+
+
 type DatabaseConfig struct {
     Engine, Name, User, Password, Host, Port string
 }
